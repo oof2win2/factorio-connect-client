@@ -18,6 +18,7 @@ interface GlobalData {
 	 * sequence number. increments by one every time something is sent
 	 */
 	sequenceNumberToSend: number
+	transferBlockNumber: number
 }
 
 const FACTORIO_VERSION: VERSION = "1.1.49.59227" as const;
@@ -28,7 +29,7 @@ const version = FACTORIO_VERSION
   .map((x) => parseInt(x));
 
 const globalData: GlobalData = {
-	connectionRequestIDGeneratedOnClient: 0x1234567b,
+	connectionRequestIDGeneratedOnClient: 0x12345688,
 	instanceID: 1923959348,
 	username: "oof2win3",
 	gamePassword: "",
@@ -42,6 +43,7 @@ const globalData: GlobalData = {
 		crc: 3210524035
 	}],
 	sequenceNumberToSend: NaN,
+	transferBlockNumber: 0,
 }
 
 const REMOTE = {
@@ -217,11 +219,23 @@ async function sendConnectionRequestReplyConfirm() {
 
 async function sendClientToServerHeartbeat(flags: number, extra?: number[]) {
 	const data = new Uint8Array([
-		0x06, // ClientToServerHeartbeat identification
+		Math.random() > 0.5 ? 0x06 : 0x06 + 0x20, // ClientToServerHeartbeat identification
 		flags,
-		...numToU8(globalData.sequenceNumberToSend++), // sequenceNumber
+		...numToU8(switchEndians(globalData.sequenceNumberToSend++)), // sequenceNumber
 		...numToU8(2**32 - 1), // nextToRecieveServerTickClosure
 		...extra || []
+	])
+	await listener.send(data, REMOTE)
+}
+
+async function sendTransferBlockReqest(blockNumber: number) {
+	const sequenceNum = numToU8(switchEndians(blockNumber))
+	while (sequenceNum.length < 4) {
+		sequenceNum.unshift(0)
+	}
+	const data = new Uint8Array([
+		Math.random() > 0.5 ? 0xc : 0x0c + 0x20, // TransferBlockReqest identification
+		...sequenceNum, // sequenceNumber
 	])
 	await listener.send(data, REMOTE)
 }
@@ -268,9 +282,12 @@ for await (const [response] of listener) {
 			// save the sequence number to start with into a variable
 			globalData.sequenceNumberToSend = switchEndians(u8ToNum(response.slice(currentByteIndex, currentByteIndex + 4)))
 
-			await sendClientToServerHeartbeat(0x10, [0x01, 0x03, 0x02])
+			await sendClientToServerHeartbeat(0x10, [0x01, 0x03, 0x02]) // send request for map
 			// send a reply to the connection request
 			setInterval(() => sendClientToServerHeartbeat(0x00), 1/5)
+			// TODO: do something to not get disconnected
+			setInterval(() => sendTransferBlockReqest(globalData.transferBlockNumber++), 0.5)
+			await sendClientToServerHeartbeat(0x10, [0x01, 0x03, 0x02]) // send connected & waiting for map
 		}
 	}
 }
