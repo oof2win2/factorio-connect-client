@@ -29,8 +29,8 @@ const version = FACTORIO_VERSION
   .map((x) => parseInt(x));
 
 const globalData: GlobalData = {
-	connectionRequestIDGeneratedOnClient: 0xda64d56b,
-	instanceID: 1372380697,
+	connectionRequestIDGeneratedOnClient: 0xda64d56b, // CHANGE THIS EVERY REQUEST
+	instanceID: 1372380697, // i assume this is the server's instance ID?
 	username: "oof2win3",
 	gamePassword: "",
 	serverKey: "",
