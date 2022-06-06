@@ -21,7 +21,7 @@ interface GlobalData {
 	transferBlockNumber: number
 }
 
-const FACTORIO_VERSION: VERSION = "1.1.49.59227" as const;
+const FACTORIO_VERSION: VERSION = "1.1.60.59770" as const;
 const REMOTE_ADDR = "144.76.101.206" as const;
 const REMOTE_PORT = 39000 as const;
 const version = FACTORIO_VERSION
@@ -29,18 +29,18 @@ const version = FACTORIO_VERSION
   .map((x) => parseInt(x));
 
 const globalData: GlobalData = {
-	connectionRequestIDGeneratedOnClient: 0x12345688,
-	instanceID: 1923959348,
+	connectionRequestIDGeneratedOnClient: 0xda64d56b,
+	instanceID: 1372380697,
 	username: "oof2win3",
 	gamePassword: "",
-	serverKey: "qXIuKKtimqugRwdCLV9gQw==",
+	serverKey: "",
 	serverKeyTimestamp: "",
-	coreChecksum: 1625176034,
+	coreChecksum: 1636702648,
 	prototypeListChecksum: 3034860339,
 	mods: [{
 		name: "base",
-		version: "1.1.49",
-		crc: 3210524035
+		version: "1.1.60",
+		crc: 3206512929
 	}],
 	sequenceNumberToSend: NaN,
 	transferBlockNumber: 0,
